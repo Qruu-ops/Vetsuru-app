@@ -10,206 +10,180 @@ class VetSuruApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'VetSürü - HerdPulse',
+      title: 'VetSürü / HerdPulse',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.teal,
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1E88E5),
+          brightness: Brightness.light,
+        ),
       ),
-      home: const DashboardScreen(),
+      home: const MainNavigationScreen(),
     );
   }
 }
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class MainNavigationScreen extends StatefulWidget {
+  const MainNavigationScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    const ViziteTakvimiPage(),
-    const HayvanListesiPage(),
-    const BuzagiProtocolPage(),
-    const KarZararPage(),
+  final List<Widget> _screens = const [
+    DashboardScreen(),
+    CattleListScreen(),
+    WeeklyScheduleScreen(),
+    FinancialScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('VetSürü / HerdPulse'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-      ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.teal,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) => setState(() => _selectedIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Vizite'),
-          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Hayvanlar'),
-          BottomNavigationBarItem(icon: Icon(Icons.child_care), label: 'Buzağı Takip'),
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Kar-Zarar'),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard),
+            label: 'Özet',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.pets_outlined),
+            selectedIcon: Icon(Icons.pets),
+            label: 'Sürü',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_today_outlined),
+            selectedIcon: Icon(Icons.calendar_today),
+            label: 'Takvim',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: Icon(Icons.account_balance_wallet),
+            label: 'Finans',
+          ),
         ],
       ),
     );
   }
 }
 
-class ViziteTakvimiPage extends StatelessWidget {
-  const ViziteTakvimiPage({super.key});
+// 1. ÖZET EKRANI
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: [
-        _buildDayCard(
-          'Pazartesi Vizitesi',
-          Colors.blue.shade100,
-          [
-            '15-22 SGS: Metrit / İltihap Kontrolü',
-            '30-37 SGS: İnvolusyon / Uterus Kontrolü',
-          ],
-        ),
-        _buildDayCard(
-          'Salı Vizitesi',
-          Colors.orange.shade100,
-          [
-            '60 SGS: Boş/Açık/Kötü Hayvanlar -> Senkronizasyon Protokolüne Al',
-          ],
-        ),
-        _buildDayCard(
-          'Çarşamba Vizitesi',
-          Colors.purple.shade100,
-          [
-            'Toplu Aşılama & Buzağı Aşılama Günü',
-          ],
-        ),
-        _buildDayCard(
-          'Perşembe Vizitesi (Gebelik & Kuru & Trans)',
-          Colors.green.shade100,
-          [
-            '30-37 TGS: 1. Gebelik Ultrason Kontrolü',
-            '60-67 TGS: 2. Gebelik Kontrolü',
-            '203-210 TGS: Kurudaki Gebelik Kontrolü',
-            '210 TGS: Kuruya Alma (Rota-Corona Aşısı Eklesin)',
-            '250 TGS: Transa Alma & Rotavec Aşısı Uygulama',
-            '262 TGS (Son 21 Gün): Doğumhaneye / Transa Al Uyarısı',
-          ],
-        ),
-        _buildDayCard(
-          'Cuma Vizitesi',
-          Colors.red.shade100,
-          [
-            'Tekrar Tohumlama Uyarısı & Takibi',
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDayCard(String title, Color color, List<String> tasks) {
-    return Card(
-      color: color,
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: ExpansionTile(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        children: tasks.map((task) => ListTile(
-          leading: const Icon(Icons.check_circle_outline),
-          title: Text(task),
-        )).toList(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('VetSürü Ana Panel'),
+        elevation: 2,
       ),
-    );
-  }
-}
-
-class HayvanListesiPage extends StatelessWidget {
-  const HayvanListesiPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: [
-        _buildAnimalCard('TR-42001892', 'Sağmal', 142, 34, 'TOHUMLU', Colors.blue),
-        _buildAnimalCard('TR-42001905', 'Sağmal', 215, 210, 'GEBE', Colors.green),
-        _buildAnimalCard('TR-42002011', 'Kuru', 0, 252, 'GEBE (Transa Alındı)', Colors.orange),
-      ],
-    );
-  }
-
-  Widget _buildAnimalCard(String tag, String status, int dim, int dsi, String repStatus, Color color) {
-    return Card(
-      elevation: 3,
-      child: ListTile(
-        title: Text(tag, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('SGS (DIM): $dim Gün | TGS (DSI): $dsi Gün'),
-        trailing: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
-          child: Text(repStatus, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        ),
-      ),
-    );
-  }
-}
-
-class BuzagiProtocolPage extends StatelessWidget {
-  const BuzagiProtocolPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: const [
-        ListTile(leading: CircleAvatar(child: Text('0G')), title: Text('Septiserum + Göbek Dezenfeksiyonu'), subtitle: Text('ADEmin - Yeldif / Ağız sütü >= 27 Brix')),
-        Divider(),
-        ListTile(leading: CircleAvatar(child: Text('5G')), title: Text('Nazal Aşı Uyarısı')),
-        Divider(),
-        ListTile(leading: CircleAvatar(child: Text('7G')), title: Text('Göbek Enfeksiyonu Kontrolü')),
-        Divider(),
-        ListTile(leading: CircleAvatar(child: Text('10G')), title: Text('Boynuz Yakma Uyarısı')),
-        Divider(),
-        ListTile(leading: CircleAvatar(child: Text('21G')), title: Text('Toplaştırma & Yeme Alıştırma (Grup Değişimi)')),
-      ],
-    );
-  }
-}
-
-class KarZararPage extends StatelessWidget {
-  const KarZararPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
         children: [
           Card(
-            color: Colors.teal.shade50,
-            child: const ListTile(
-              title: Text('Aylık Süt Geliri'),
-              subtitle: Text('Satılan: Fabrika A.Ş.'),
-              trailing: Text('+45.000 ₺', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16)),
+            color: Colors.blue.shade50,
+            child: const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAlignment.start,
+                children: [
+                  Text('Çiftlik Durumu', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 8),
+                  Text('Toplam Sağmal: 45 | Kuru: 10 | Gebe: 30'),
+                ],
+              ),
             ),
           ),
-          Card(
-            color: Colors.red.shade50,
-            child: const ListTile(
-              title: Text('Aylık Yem & Masraflar'),
-              subtitle: Text('Ham madde + Vet + Elektrik/Su'),
-              trailing: Text('-28.500 ₺', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
+          const SizedBox(height: 12),
+          const Text('Veteriner Uyarıları (Bu Hafta)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          const ListTile(
+            leading: Icon(Icons.event_repeat, color: Colors.orange),
+            title: Text('Gebelik Kontrolü Zamanı Gelenler'),
+            subtitle: Text('TR42001, TR42005 (DSI > 40 gün)'),
+          ),
+          const ListTile(
+            leading: Icon(Icons.water_drop, color: Colors.blue),
+            title: Text('Kuruya Alınacak İnekler'),
+            subtitle: Text('TR42012 (Gebelikte 220. gün)'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// 2. SÜRÜ LİSTESİ EKRANI
+class CattleListScreen extends StatelessWidget {
+  const CattleListScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sürü Yönetimi')),
+      body: ListView(
+        children: const [
+          ListTile(
+            leading: CircleAvatar(child: Text('42')),
+            title: Text('TR42001 - Sarıkız'),
+            subtitle: Text('DIM: 120 gün | DSI: 45 gün (Gebe)'),
+            trailing: Icon(Icons.chevron_right),
+          ),
+          Divider(),
+          ListTile(
+            leading: CircleAvatar(child: Text('43')),
+            title: Text('TR42002 - Papatya'),
+            subtitle: Text('DIM: 45 gün | Tohumlanmadı'),
+            trailing: Icon(Icons.chevron_right),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+// 3. HAFTALIK PROGRAM EKRANI
+class WeeklyScheduleScreen extends StatelessWidget {
+  const WeeklyScheduleScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Haftalık Veteriner Takvimi')),
+      body: const Center(
+        child: Text('Çiftlik Protokolleri ve Haftalık Aşı/Muayene Listesi'),
+      ),
+    );
+  }
+}
+
+// 4. FİNANS EKRANI
+class FinancialScreen extends StatelessWidget {
+  const FinancialScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Finans ve Maliyet Takibi')),
+      body: const Center(
+        child: Text('Yem, İlaç ve Süt Geliri Analizi'),
       ),
     );
   }
